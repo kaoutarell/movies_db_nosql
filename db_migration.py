@@ -94,6 +94,5 @@ with open("keywords.csv", "w", newline="") as f:
     writer.writerow(["keyword", "movies"])
     writer.writerows(keywords)
 
-# Repeat similar queries for actors, countries, and keywords
 cur.close()
 conn.close()
