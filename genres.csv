@@ -1,0 +1,20 @@
+genre,movies
+Comedy,"['Deadpool & Wolverine', 'Red One', 'Despicable Me 4', 'Inside Out 2', 'Sing: Thriller', 'Beetlejuice Beetlejuice', 'The Canterville Ghost', 'Bad Boys: Ride or Die', 'My Old Ass', 'Moana 2']"
+TV Movie,[None]
+Drama,"['Apocalypse Z: The Beginning of the End', 'Gladiator II', 'The Substance', 'The Count of Monte-Cristo', 'Inside Out 2', 'Freedom', 'Gladiator', 'Joker: Folie à Deux', 'Kelas Bintang - Hot Moms', 'Let Go', 'Wicked', 'My Old Ass', 'My Fault', 'Megalopolis']"
+Horror,"['Terrifier 3', 'Apocalypse Z: The Beginning of the End', 'The Substance', 'Alien: Romulus', 'Arcadian', 'Whisper of the Witch', 'Azrael', 'Sing: Thriller', 'Amityville: Where the Echo Lives', 'Do Not Enter', 'Beetlejuice Beetlejuice', 'Terrifier', 'The Platform 2', ""Don't Move"", 'Bagman', 'Terrifier 2', 'Time Cut', 'The Crow']"
+Family,"['The Wild Robot', 'Transformers One', 'Despicable Me 4', 'Inside Out 2', 'Sing: Thriller', 'The Canterville Ghost', 'Moana 2']"
+Romance,"['The Count of Monte-Cristo', 'Freedom', 'Kelas Bintang - Hot Moms', 'Wicked', 'My Fault']"
+Science Fiction,"['Venom: The Last Dance', 'The Wild Robot', 'Deadpool & Wolverine', 'The Substance', 'Transformers One', 'Alien: Romulus', 'Arcadian', 'Venom', 'Survive', 'Venom: Let There Be Carnage', 'The Platform 2', ""My Hero Academia: You're Next"", 'Megalopolis', 'Time Cut']"
+War,['Battle for the Western Front']
+Documentary,[None]
+Thriller,"['Terrifier 3', 'Classified', 'Arcadian', 'Cash Out', 'The Count of Monte-Cristo', 'Whisper of the Witch', 'Survive', 'Azrael', 'Joker: Folie à Deux', 'Canary Black', 'Take Cover', 'Dominique', 'Terrifier', ""Don't Move"", 'Bagman', 'Terrifier 2', 'Time Cut']"
+Adventure,"['Venom: The Last Dance', 'Gladiator II', 'Transformers One', 'The Count of Monte-Cristo', 'Inside Out 2', 'Survive', 'Venom: Let There Be Carnage', 'Gladiator', 'Moana 2', ""My Hero Academia: You're Next"", 'Flow']"
+Mystery,"['Terrifier 3', 'Amityville: Where the Echo Lives']"
+Music,[None]
+Fantasy,"['Red One', 'Beetlejuice Beetlejuice', 'The Canterville Ghost', 'Wicked', 'Flow', 'Megalopolis', 'The Crow']"
+Crime,"['Joker: Folie à Deux', 'Canary Black']"
+Western,[None]
+Action,"['Venom: The Last Dance', 'Apocalypse Z: The Beginning of the End', 'Gladiator II', 'Deadpool & Wolverine', 'Red One', 'Classified', 'Despicable Me 4', 'Arcadian', 'Cash Out', 'The Count of Monte-Cristo', 'Venom', 'Survive', 'Venom: Let There Be Carnage', 'Freedom', 'Gladiator', 'Azrael', 'Canary Black', 'Take Cover', 'Dominique', 'Bad Boys: Ride or Die', ""My Hero Academia: You're Next"", 'The Crow']"
+History,['The Count of Monte-Cristo']
+Animation,"['The Wild Robot', 'Transformers One', 'Despicable Me 4', 'Inside Out 2', 'Sing: Thriller', 'The Canterville Ghost', 'Moana 2', ""My Hero Academia: You're Next"", 'Flow']"

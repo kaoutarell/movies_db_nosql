@@ -1,4 +1,4 @@
-import psycopg2 # type: ignore
+import psycopg2
 import csv
 from dotenv import load_dotenv # type: ignore
 import os
@@ -16,25 +16,16 @@ conn = psycopg2.connect(
 )
 cur = conn.cursor()
 
-# Extract Movies
+# 1. Extract Movies Data
 cur.execute("""
     SELECT m.title, m.plot, cr.rating AS content_rating, 
            r.viewer_rating, m.release_year, 
-           ARRAY_AGG(g.name) AS genres,
-           ARRAY_AGG(l.name) AS languages,
-           ARRAY_AGG(a.title) AS akas,
            wm.watchmode_id AS watchmode_id
     FROM movie m
     LEFT JOIN movie_content_rating mcr ON m.movie_id = mcr.movie_id
     LEFT JOIN content_rating cr ON mcr.content_rating_id = cr.content_rating_id
     LEFT JOIN movie_review mr ON m.movie_id = mr.movie_id
     LEFT JOIN review r ON mr.review_id = r.review_id
-    LEFT JOIN movie_genre mg ON m.movie_id = mg.movie_id
-    LEFT JOIN genre g ON mg.genre_id = g.genre_id
-    LEFT JOIN movie_language ml ON m.movie_id = ml.movie_id
-    LEFT JOIN language_ l ON ml.language_id = l.language_id
-    LEFT JOIN movie_aka ma ON m.movie_id = ma.movie_id
-    LEFT JOIN aka a ON ma.aka_id = a.aka_id
     LEFT JOIN movie_watchmode mw ON m.movie_id = mw.movie_id
     LEFT JOIN watchmode wm ON mw.watchmode_id = wm.watchmode_id
     GROUP BY m.movie_id, cr.rating, r.viewer_rating, wm.watchmode_id;
@@ -43,10 +34,42 @@ movies = cur.fetchall()
 
 with open("movies.csv", "w", newline="") as f:
     writer = csv.writer(f)
-    writer.writerow(["title", "plot", "content_rating", "viewer_rating", "release_year", "genres", "languages", "akas", "watchmode_id"])
+    writer.writerow(["title", "plot", "content_rating", "viewer_rating", "release_year", "watchmode_id"])
     writer.writerows(movies)
 
-# Extract Actors
+# 2. Extract Genres Data
+cur.execute("""
+    SELECT g.name AS genre, 
+           ARRAY_AGG(m.title) AS movies
+    FROM genre g
+    LEFT JOIN movie_genre mg ON g.genre_id = mg.genre_id
+    LEFT JOIN movie m ON mg.movie_id = m.movie_id
+    GROUP BY g.genre_id;
+""")
+genres = cur.fetchall()
+
+with open("genres.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["genre", "movies"])
+    writer.writerows(genres)
+
+# 3. Extract Languages Data
+cur.execute("""
+    SELECT l.name AS language, 
+           ARRAY_AGG(m.title) AS movies
+    FROM language_ l
+    LEFT JOIN movie_language ml ON l.language_id = ml.language_id
+    LEFT JOIN movie m ON ml.movie_id = m.movie_id
+    GROUP BY l.language_id;
+""")
+languages = cur.fetchall()
+
+with open("languages.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["language", "movies"])
+    writer.writerows(languages)
+
+# 4. Extract Actors Data
 cur.execute("""
     SELECT a.name AS actor_name, 
            ARRAY_AGG(m.title) AS movies
@@ -62,7 +85,7 @@ with open("actors.csv", "w", newline="") as f:
     writer.writerow(["actor_name", "movies"])
     writer.writerows(actors)
 
-# Extract Countries
+# 5. Extract Countries Data
 cur.execute("""
     SELECT c.name AS country_name, c.country_code, 
            ARRAY_AGG(m.title) AS movies
@@ -78,7 +101,7 @@ with open("countries.csv", "w", newline="") as f:
     writer.writerow(["country_name", "country_code", "movies"])
     writer.writerows(countries)
 
-# Extract Keywords
+# 6. Extract Keywords Data
 cur.execute("""
     SELECT k.name AS keyword, 
            ARRAY_AGG(m.title) AS movies
@@ -94,5 +117,6 @@ with open("keywords.csv", "w", newline="") as f:
     writer.writerow(["keyword", "movies"])
     writer.writerows(keywords)
 
+# Closing the connection
 cur.close()
 conn.close()
