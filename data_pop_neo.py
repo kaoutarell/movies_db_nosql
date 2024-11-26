@@ -2,13 +2,13 @@ from neo4j import GraphDatabase  # type: ignore
 from dotenv import load_dotenv  # type: ignore
 import os
 
-# Load environment variables 
+# Load environment variables
 load_dotenv()
 
-# Connect to Neo4j Aura 
-uri = os.getenv("NEO4J_URI") 
+# Connect to Neo4j Aura
+uri = os.getenv("NEO4J_URI")
 username = os.getenv("NEO4J_USERNAME")
-password = os.getenv("NEO4J_PASSWORD")  
+password = os.getenv("NEO4J_PASSWORD")
 
 # Connect to the database
 try:
@@ -25,22 +25,27 @@ finally:
         driver.close()
 
 
-# Function to create nodes and relationships
+# Function to create nodes and relationships from CSV data
 def create_nodes_and_relationships(session):
     # 1. Movies data and Movie nodes
     session.run("""
     LOAD CSV WITH HEADERS FROM 'https://drive.google.com/uc?export=download&id=1PSkijnWnG--CIBeWG9VS56z6RhDaYhg6' AS row
-    CREATE (m:Movie {
-        title: row.title,
-        plot: row.plot,
-        content_rating: row.content_rating,
-        viewer_rating: toFloat(row.viewer_rating),
-        release_year: toInteger(row.release_year),
-        watchmode_id: row.watchmode_id
-    });
+    WITH row
+    MERGE (m:Movie {title: row.title})
+    ON CREATE SET m.plot = row.plot, 
+                m.content_rating = row.content_rating, 
+                m.viewer_rating = toFloat(row.viewer_rating),
+                m.release_year = toInteger(row.release_year),
+                m.watchmode_id = CASE WHEN row.watchmode_id IS NOT NULL AND row.watchmode_id <> '' THEN row.watchmode_id ELSE NULL END
+    ON MATCH SET m.plot = row.plot, 
+                m.content_rating = row.content_rating, 
+                m.viewer_rating = toFloat(row.viewer_rating),
+                m.release_year = toInteger(row.release_year),
+                m.watchmode_id = CASE WHEN row.watchmode_id IS NOT NULL AND row.watchmode_id <> '' THEN row.watchmode_id ELSE m.watchmode_id END
+    RETURN row.title;
     """)
 
-    # 2. Genres data and Genre nodes, then relate them to Movies --> required 
+    # 2. Genres data and Genre nodes, then relate them to Movies
     session.run("""
     LOAD CSV WITH HEADERS FROM 'https://drive.google.com/uc?export=download&id=18orT5EblD6Abyu67u69LP0fr8nSY3X6o' AS row
     MERGE (g:Genre {name: row.genre})
@@ -50,38 +55,37 @@ def create_nodes_and_relationships(session):
     MERGE (m)-[:HAS_GENRE]->(g);
     """)
 
-    # 3. Languages data and Language nodes, then relate them to Movies --> required 
+    # 3. Actors data and Actor nodes, then relate them to Movies
     session.run("""
-    LOAD CSV WITH HEADERS FROM 'https://drive.google.com/uc?export=download&id=1k9FkaDbr-2hITiimIHVk0W1lrMqNIUp-' AS row
-    WITH row WHERE row.language IS NOT NULL AND row.language <> ''
-    MERGE (l:Language {name: row.language})
-    WITH l, row
-    UNWIND split(row.movies, ',') AS movie_title
-    MATCH (m:Movie {title: movie_title})
-    MERGE (m)-[:HAS_LANGUAGE]->(l);
+    LOAD CSV WITH HEADERS FROM 'https://drive.google.com/uc?export=download&id=1906saR4S2dsfWprVgxMzSbhk6FaE-Ius' AS row
+    WITH row
+    WHERE row.first_name IS NOT NULL AND row.last_name IS NOT NULL
+    // Clean up the 'movies' column (remove brackets, quotes, and split the movie titles by comma)
+    WITH row, trim(replace(replace(row.movies, '[', ''), ']', '')) AS cleaned_movies
+    // Remove any extra spaces or quotes around movie titles
+    WITH row, split(replace(cleaned_movies, '"', ''), ',') AS movie_titles
+    UNWIND movie_titles AS movie_title
+    WITH row, trim(movie_title) AS clean_movie_title
+    MATCH (m:Movie {title: clean_movie_title})
+    MERGE (a:Actor {first_name: row.first_name, last_name: row.last_name})
+    MERGE (a)-[:HAS_ACTOR]->(m);  // Create relationship between actor and movie
     """)
 
-    # 4. Actors data and Actor nodes, then relate them to Movies
-    session.run("""
-    LOAD CSV WITH HEADERS FROM 'https://drive.google.com/uc?export=download&id=1oreKJWYH9y_3iSV7eT-AerwI725kg8U9' AS row
-    MERGE (a:Actor {name: row.actor_name})
-    WITH a, row
-    UNWIND split(row.movies, ',') AS movie_title
-    MATCH (m:Movie {title: movie_title})
-    MERGE (a)-[:ACTED_IN]->(m);
-    """)
 
-    # 5. Countries data and Country nodes, then relate them to Movies
+
+
+    # 4. Countries data and Country nodes, then relate them to Movies
     session.run("""
     LOAD CSV WITH HEADERS FROM 'https://drive.google.com/uc?export=download&id=1TWDZyExrigDz_KAAt2DZo96jfzyIFv0X' AS row
-    MERGE (c:Country {name: row.country_name, country_code: row.country_code})
+    MERGE (c:Country {name: row.country_name})
+    ON CREATE SET c.country_code = row.country_code
     WITH c, row
     UNWIND split(row.movies, ',') AS movie_title
     MATCH (m:Movie {title: movie_title})
     MERGE (m)-[:HAS_COUNTRY]->(c);
     """)
 
-    # 6. Keywords data and Keyword nodes, then relate them to Movies
+    # 5. Keywords data and Keyword nodes, then relate them to Movies
     session.run("""
     LOAD CSV WITH HEADERS FROM 'https://drive.google.com/uc?export=download&id=1z7UXWUw9q841BmSmmomLUUBhGH8_8NtG' AS row
     MERGE (k:Keyword {name: row.keyword})
@@ -92,6 +96,7 @@ def create_nodes_and_relationships(session):
     """)
 
     print("Nodes and relationships created successfully!")
+
 
 if __name__ == "__main__":
     try:
