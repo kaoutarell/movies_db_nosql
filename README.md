@@ -1,6 +1,14 @@
 # Movies in a NOSQL Database
 
-Migrate the movies database from RDBMS to a NoSql database (cloud)
+Migrate the movies database from RDBMS to a NoSql database (GraphSQL)
+
+## Answers Organization
+
+- Data exportation in CSV files : /db_migration.py
+- Csv files of the corresponding nodes/entities : /GENERATED CSVs/..
+  (for the code : csv files are uploaded on Google Drive because Neo4j doesn't work with local paths)
+- Script to create the database and populate the data : /db_pop_neo.py
+- Queries : /queries.cypher
 
 ## Python Config (same configuration as in assignment 2)
 

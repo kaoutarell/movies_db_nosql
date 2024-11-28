@@ -5,7 +5,7 @@ import os
 # Load environment variables
 load_dotenv()
 
-# Connect to Neo4j Aura
+# Connect to Neo4j
 uri = os.getenv("NEO4J_URI")
 username = os.getenv("NEO4J_USERNAME")
 password = os.getenv("NEO4J_PASSWORD")
